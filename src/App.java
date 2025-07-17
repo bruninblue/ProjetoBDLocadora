@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import entidades.Cliente;
@@ -104,7 +105,16 @@ public class App {
 
     }
     public static void listarClientes(){
-        
+        ArrayList<Cliente> clientes = new ArrayList<>();
+        clientes = new ClienteDAO().listarClientes();
+
+        for(Cliente cli : clientes){
+            System.out.println("--------------------------------");
+            System.out.println("Nome: " + cli.getNomeCompleto());
+            System.out.println("CPF: " + cli.getCpf());
+            System.out.println("Telefone:  " + cli.getNumTelefone());
+        }
+
     }
     public static void alterarCliente(){
         
