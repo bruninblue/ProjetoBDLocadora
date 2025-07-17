@@ -1,6 +1,6 @@
 # ProjetoBDLocadora
 
-###Cliente:
+Cliente:
 inserir ✅
 lista ✅
 alterar
