@@ -1,15 +1,15 @@
 package entidades;
 
 public class Cliente {
-    private int id;
+    private String cpf;
     private String nomeCompleto;
     private String numTelefone;
     
-    public int getId() {
-        return id;
+    public String getCpf() {
+        return cpf;
     }
-    public void setId(int id) {
-        this.id = id;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
     public String getNomeCompleto() {
         return nomeCompleto;
@@ -23,6 +23,4 @@ public class Cliente {
     public void setNumTelefone(String numTelefone) {
         this.numTelefone = numTelefone;
     }
-
-    
 }
