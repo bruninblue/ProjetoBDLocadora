@@ -3,9 +3,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import com.mysql.cj.xdevapi.Client;
-
 import conexao.Conexao;
 import entidades.Cliente;
 
@@ -45,7 +42,6 @@ public class ClienteDAO {
         try{
             ps = Conexao.getConexao().prepareStatement(query_select);
             ResultSet resultado = ps.executeQuery();
-
             while (resultado.next()) {
                 Cliente cli = new Cliente();
                 cli.setCpf(resultado.getString("cpf"));
@@ -54,10 +50,74 @@ public class ClienteDAO {
 
                 listCli.add(cli);
             }
+            ps.close();
         }catch (SQLException e) {
             System.out.println("Erro ao consultar: " + e.getMessage());
         }
 
         return listCli;
+    }
+
+    public boolean alterarDadosCliente(Cliente novoDado, int opcaoAlterar){
+        PreparedStatement ps = null;
+        String query_update = "";
+        if(opcaoAlterar == 1){
+            //Alterar só o nome completo
+
+            query_update = "UPDATE CLIENTE SET NOME_COMPLETO = ? WHERE CPF = ?";
+
+            try {
+                ps = Conexao.getConexao().prepareStatement(query_update);
+                ps.setString(1, novoDado.getNomeCompleto());
+                ps.setString(2, novoDado.getCpf());
+                
+                ps.executeUpdate();
+
+                ps.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+        }else if(opcaoAlterar == 2){
+            //Alterar só o número de telefone
+            query_update = "UPDATE CLIENTE SET NUM_TELEFONE = ? WHERE CPF = ?";
+
+            try {
+                ps = Conexao.getConexao().prepareStatement(query_update);
+                ps.setString(1, novoDado.getNumTelefone());
+                ps.setString(2, novoDado.getCpf());
+
+                ps.execute();
+
+                ps.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+        }else if(opcaoAlterar == 3){
+            //Alterar nome completo e número de telefone
+            query_update = "UPDATE CLIENTE SET NOME_COMPLETO = ?, NUM_TELEFONE = ? WHERE CPF = ?";
+
+            try {
+                ps = Conexao.getConexao().prepareStatement(query_update);
+                ps.setString(1, novoDado.getNomeCompleto());
+                ps.setString(2, novoDado.getNumTelefone());
+                ps.setString(3, novoDado.getCpf());
+
+                ps.execute();
+
+                ps.close();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        return true;
     }
 }

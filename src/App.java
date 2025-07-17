@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import utils.Utils;
 import entidades.Cliente;
 import entidadesDAO.ClienteDAO;
 public class App {
@@ -60,10 +60,10 @@ public class App {
                     listarClientes();
                     break;
                 case 3:
-                    alterarCliente();
+                    excluirCliente();
                     break;
                 case 4:
-                    excluirCliente();
+                    alterarCliente();
                     break;
                 case 5:
                     menuPrincipal();
@@ -117,6 +117,34 @@ public class App {
 
     }
     public static void alterarCliente(){
+        System.out.println("Qual informação deseja altera?");
+        System.out.println("1 - Nome completo");
+        System.out.println("2 - Número de telefone");
+        System.out.println("3 - Os dois dados");
+        int opcao = leia.nextInt();
+
+        System.out.println("Qual o cpf do cliente que deseja alterar?");
+        leia.nextLine();//limpar buffer
+        String cpf = leia.nextLine();
+
+        if(Utils.verificarExistenciaCliente(cpf) == 1){
+            if(opcao == 1){
+                System.out.println("Digite o novo nome completo: ");
+                String novoNome = leia.nextLine();
+                Cliente cli = new Cliente();
+                cli.setCpf(cpf);
+                cli.setNomeCompleto(novoNome);
+
+                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                    System.out.println("Alteração feita com sucesso");
+                }else{
+                    System.out.println("Não foi possível fazer a alteração");
+                }
+                
+            }
+        }
+
+        
         
     }
     public static void excluirCliente(){
