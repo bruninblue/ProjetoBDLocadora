@@ -2,7 +2,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import utils.Utils;
 import entidades.Cliente;
+import entidades.Genero;
 import entidadesDAO.ClienteDAO;
+import entidadesDAO.GeneroDAO;
 public class App {
     
     public static Scanner leia = new Scanner(System.in);
@@ -14,12 +16,13 @@ public class App {
     public static void menuPrincipal(){
         int opcao = 0;
 
-        while(opcao != 4){
+        while(opcao != 5){
             System.out.println("Bem-vindo a locadora de filmes, qual a sua categoria?");
             System.out.println("1 - Cliente");
             System.out.println("2 - Filmes");
             System.out.println("3 - Aluguel");
-            System.out.println("4 - Sair");
+            System.out.println("4 - Gêneros");
+            System.out.println("5 - Sair");
             
             System.out.println("Digite uma opção: ");
             opcao = leia.nextInt();
@@ -33,6 +36,9 @@ public class App {
                     break;
                 case 3:
                     menuAluguel();
+                    break;
+                case 4:
+                    menuGeneros();
                     break;
             }
         }
@@ -79,6 +85,24 @@ public class App {
     public static void menuAluguel(){
 
     }
+
+    public static void menuGeneros(){
+        System.out.println("Menu de Gêneros");
+        System.out.println("1 - Criar um novo gênero");
+        System.out.println("2 - Listar gênero");
+        System.out.println("3 - Deletar gênero");
+
+        int opcao = leia.nextInt();
+        
+        switch (opcao) {
+            case 1:
+                //criarGenero();
+                break;
+            case 2:
+                listarGeneros();
+                break;
+        }
+    }
     //-----------Cliente--------------
     public static void inserirCliente(){
         //Adicionar verificações
@@ -107,7 +131,7 @@ public class App {
             System.out.println("Um cliente com o CPF digitado já existe no sistema!");
         }
     }
-    
+
     public static void listarClientes(){
         ArrayList<Cliente> clientes = new ArrayList<>();
         clientes = new ClienteDAO().listarClientes();
@@ -215,6 +239,23 @@ public class App {
     public static void excluirFilme(){
         
     }
-    
+
+    //----------Gênero----------------
+    public static void inserirGenero(){
+        
+    }
+    public static void listarGeneros(){
+        ArrayList<Genero> listaGeneros = new ArrayList<>();
+        listaGeneros = new GeneroDAO().listarGeneros();
+
+        for(Genero gen : listaGeneros){
+            System.out.println("-----------------------");
+            System.out.println("ID: " + gen.getId());
+            System.out.println("Tipo: " + gen.getTipo_genero());
+        }
+    }
+    public static void deletarGênero(){
+        
+    }
     
 }
