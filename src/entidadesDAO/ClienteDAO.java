@@ -20,7 +20,7 @@ public class ClienteDAO {
             ps.setString(2, cli.getNomeCompleto());
             ps.setString(3, cli.getNumTelefone());
 
-            ps.execute();
+            ps.executeUpdate();
 
             ps.close();
 
@@ -89,7 +89,7 @@ public class ClienteDAO {
                 ps.setString(1, novoDado.getNumTelefone());
                 ps.setString(2, novoDado.getCpf());
 
-                ps.execute();
+                ps.executeUpdate();
 
                 ps.close();
 
@@ -108,7 +108,7 @@ public class ClienteDAO {
                 ps.setString(2, novoDado.getNumTelefone());
                 ps.setString(3, novoDado.getCpf());
 
-                ps.execute();
+                ps.executeUpdate();
 
                 ps.close();
 
@@ -116,6 +116,25 @@ public class ClienteDAO {
                 e.printStackTrace();
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    public boolean deletarCliente(String cpf){
+        String query_delete = "DELETE FROM CLIENTE WHERE CPF = ?";
+
+        PreparedStatement ps = null;
+
+        try{
+            ps = Conexao.getConexao().prepareStatement(query_delete);
+            ps.setString(1, cpf);
+            ps.executeUpdate();
+            ps.close();
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
 
         return true;

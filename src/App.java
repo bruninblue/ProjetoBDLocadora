@@ -116,6 +116,26 @@ public class App {
         }
 
     }
+
+    public static void excluirCliente(){
+        System.out.println("Digite o CPF do cliente que deseja deletar do sistema: ");
+        leia.nextLine();//limpar buffer
+        String cpf = leia.nextLine();
+
+        if(Utils.verificarExistenciaCliente(cpf) == 1){
+
+            if(new ClienteDAO().deletarCliente(cpf)){
+                System.out.println("Exclusão feita com sucesso!");
+            }else{
+                System.out.println("Não foi possível deletar o cliente!");
+            }
+
+        }else{
+
+            System.out.println("Não foi possível encontrar o CPF digitado!");
+        }
+    }
+
     public static void alterarCliente(){
         System.out.println("Qual informação deseja altera?");
         System.out.println("1 - Nome completo");
@@ -138,18 +158,45 @@ public class App {
                 if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
                     System.out.println("Alteração feita com sucesso");
                 }else{
-                    System.out.println("Não foi possível fazer a alteração");
+                    System.out.println("Não foi possível realizar a alteração");
                 }
                 
             }
-        }
+            else if(opcao == 2){
+                System.out.println("Digite o novo número de telefone: ");
+                String novoTelefone = leia.nextLine();
+                Cliente cli = new Cliente();
+                cli.setCpf(cpf);
+                cli.setNumTelefone(novoTelefone);
 
-        
+                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                    System.out.println("Alteração feita com sucesso");
+                }else{
+                    System.out.println("Não foi possível realizar a alteração");
+                }
+            }
+            else if(opcao == 3){
+                System.out.println("Digite o novo nome completo: ");
+                String novoNome = leia.nextLine();
+                System.out.println("Digite o novo número de telefone");
+                String novoTelefone = leia.nextLine();
+                Cliente cli = new Cliente();
+                cli.setCpf(cpf);
+                cli.setNomeCompleto(novoNome);
+                cli.setNumTelefone(novoTelefone);
+
+                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                    System.out.println("Alteração feita com sucesso");
+                }else{
+                    System.out.println("Não foi possível realizar a alteração!");
+                }
+            }
+        }else{
+            System.out.println("CPF digitado não foi encontrado");
+        } 
         
     }
-    public static void excluirCliente(){
-        
-    }
+    
 
     //----------Filmes-----------------
     public static void inserirFilme(){
