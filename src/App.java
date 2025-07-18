@@ -85,25 +85,29 @@ public class App {
         System.out.println("Digite seu CPF: ");
         leia.nextLine(); //limpeza buffer;
         String cpf = leia.nextLine();
-        
-        System.out.println("Digite seu nome completo: ");
-        String nome_completo = leia.nextLine();
-        
-        System.out.println("Digite seu número de telefone: ");
-        String telefone = leia.nextLine();
 
-        Cliente clienteNovo = new Cliente();
-        clienteNovo.setCpf(cpf);
-        clienteNovo.setNomeCompleto(nome_completo);
-        clienteNovo.setNumTelefone(telefone);
-        
-        if(new ClienteDAO().inserirCliente(clienteNovo)){
-            System.out.println("Cadastrado com sucesso.");
+        if(Utils.verificarExistenciaCliente(cpf) == 0){
+            System.out.println("Digite seu nome completo: ");
+            String nome_completo = leia.nextLine();
+            
+            System.out.println("Digite seu número de telefone: ");
+            String telefone = leia.nextLine();
+
+            Cliente clienteNovo = new Cliente();
+            clienteNovo.setCpf(cpf);
+            clienteNovo.setNomeCompleto(nome_completo);
+            clienteNovo.setNumTelefone(telefone);
+            
+            if(new ClienteDAO().inserirCliente(clienteNovo)){
+                System.out.println("Cadastrado com sucesso.");
+            }else{
+                System.out.println("Não foi possível cadastrar o cliente.");
+            }
         }else{
-            System.out.println("Não foi possível cadastrar o cliente.");
+            System.out.println("Um cliente com o CPF digitado já existe no sistema!");
         }
-
     }
+    
     public static void listarClientes(){
         ArrayList<Cliente> clientes = new ArrayList<>();
         clientes = new ClienteDAO().listarClientes();
