@@ -75,11 +75,30 @@ public class AluguelDAO {
             ps.setInt(4, idAluguel);
 
             ps.executeUpdate();
+            ps.close();
             return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean excluirAluguel(int idAluguel) {
+        String sql = "DELETE FROM locacao WHERE id = ?";
+
+        PreparedStatement ps = null;
+
+        try {
+            ps = Conexao.getConexao().prepareStatement(sql);
+            ps.setInt(1, idAluguel);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao excluir aluguel: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 }

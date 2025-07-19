@@ -6,9 +6,16 @@ import utils.Utils;
 import entidades.Cliente;
 import entidades.Filme;
 import entidades.Genero;
+import entidades.Aluguel;
+import entidades.Acervo;
+import entidades.ItemLocacao;
 import entidadesDAO.ClienteDAO;
 import entidadesDAO.FilmeDAO;
 import entidadesDAO.GeneroDAO;
+import entidadesDAO.AluguelDAO;
+import entidadesDAO.AcervoDAO;
+import entidadesDAO.ItemLocacaoDAO;
+
 public class App {
     
     public static Scanner leia = new Scanner(System.in);
