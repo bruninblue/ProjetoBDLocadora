@@ -4,23 +4,25 @@ import java.sql.Date;
 
 public class Aluguel {
     private int id;
-    private int clienteId;
+    private String clienteCpf;
     private int filmeId;
     private Date dataAluguel;
     private Date dataDevolucao;
     private float valorPagar;
+    private float multa;
     private int pendente;
+
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
     }
-    public int getClienteId() {
-        return clienteId;
+    public String getClienteCpf() {
+        return clienteCpf;
     }
-    public void setClienteId(int clienteId) {
-        this.clienteId = clienteId;
+    public void setClienteCpf(String clienteCpf) {
+        this.clienteCpf = clienteCpf;
     }
     public int getFilmeId() {
         return filmeId;
@@ -45,6 +47,12 @@ public class Aluguel {
     }
     public void setValorPagar(float valorPagar) {
         this.valorPagar = valorPagar;
+    }
+    public float getMulta() {
+        return multa;
+    }
+    public void setMulta(float multa) {
+        this.multa = multa;
     }
     public int getPendente() {
         return pendente;
