@@ -57,7 +57,7 @@ CREATE TABLE itemlocacao (
   idLocacao INT NOT NULL,
   idAcervo INT NOT NULL,
   PRIMARY KEY (idItemLocacao),
-  FOREIGN KEY (idLocacao) REFERENCES locacao(idLocacao),
+  FOREIGN KEY (idLocacao) REFERENCES locacao(idLocacao) ON DELETE CASCADE,
   FOREIGN KEY (idAcervo) REFERENCES acervo(idAcervo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_520_ci;
 
