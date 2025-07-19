@@ -4,7 +4,7 @@ import java.sql.Date;
 
 public class Filme {
     private int id;
-    private String título;
+    private String titulo;
     private Date dataLancamento;
     private int genero;
     private float valor;
@@ -15,11 +15,11 @@ public class Filme {
     public void setId(int id) {
         this.id = id;
     }
-    public String getTítulo() {
-        return título;
+    public String getTitulo() {
+        return titulo;
     }
-    public void setTítulo(String título) {
-        this.título = título;
+    public void setTitulo(String título) {
+        this.titulo = título;
     }
     public Date getDataLancamento() {
         return dataLancamento;

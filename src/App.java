@@ -1,9 +1,13 @@
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import utils.Utils;
 import entidades.Cliente;
+import entidades.Filme;
 import entidades.Genero;
 import entidadesDAO.ClienteDAO;
+import entidadesDAO.FilmeDAO;
 import entidadesDAO.GeneroDAO;
 public class App {
     
@@ -79,6 +83,27 @@ public class App {
         
     }
     public static void menuFilmes(){
+        System.out.println("Menu de Filmes");
+        System.out.println("1 - Cadastrar novo filme");
+        System.out.println("2 - Listar filmes cadastrados");
+        System.out.println("3 - Alterar dados do filme");
+        System.out.println("4 - Excluir filme");
+
+        int opcao = leia.nextInt();
+
+        switch (opcao) {
+            case 1:
+                inserirFilme();
+                break;
+            case 2:
+                listarFilme();
+                break;
+            case 3: 
+                alterarFilme();
+                break;
+            case 4:
+                excluirFilme();
+        }
         
     }
 
@@ -228,21 +253,148 @@ public class App {
 
     //----------Filmes-----------------
     public static void inserirFilme(){
-        
+        System.out.println("Digite o título do filme: ");
+        leia.nextLine();
+        String titulo = leia.nextLine();
+
+        System.out.println("Digite a data de lançamento do filme (AAAA-MM-DD): ");
+        String dataLancamento = leia.nextLine();
+
+        listarGeneros();
+        System.out.println("Digite o gênero do filme: ");
+        int genero = leia.nextInt();
+        GeneroDAO generoDAO = new GeneroDAO();
+        while (generoDAO.buscarGeneroPorId(genero) == null) {
+            System.out.println("Gênero não encontrado. Por favor, digite um ID de gênero válido: ");
+            genero = leia.nextInt();            
+        }
+
+
+        System.out.println("Digite o valor do aluguel do filme: ");
+        float valor = leia.nextFloat();
+
+        Filme novoFilme = new Filme();
+        novoFilme.setTitulo(titulo);
+        novoFilme.setDataLancamento(Date.valueOf(dataLancamento));
+        novoFilme.setGenero(genero);
+        novoFilme.setValor(valor);
+
+        if(new FilmeDAO().criarFilme(novoFilme)){
+            System.out.println("Filme cadastrado com sucesso!");
+        } else {
+            System.out.println("Não foi possível cadastrar o filme.");
+        }
     }
     public static void listarFilme(){
-        
+        List<Filme> listaFilmes = new FilmeDAO().listarFilmes();
+        if(listaFilmes.isEmpty()){
+            System.out.println("Nenhum filme cadastrado.");
+        } else {
+            for(Filme filme : listaFilmes){
+                System.out.println("-----------------------");
+                System.out.println("ID: " + filme.getId());
+                System.out.println("Título: " + filme.getTitulo());
+                System.out.println("Data de Lançamento: " + filme.getDataLancamento());
+                System.out.println("Gênero: " + filme.getGenero());
+                System.out.println("Valor: " + filme.getValor());
+            }
+        }
     }
     public static void alterarFilme(){
+        listarFilme();
+        
+        FilmeDAO filmeDAO = new FilmeDAO();
+
+        System.out.println("-----------------------");
+        System.out.println("Digite o ID do filme que deseja alterar: ");
+        int id = leia.nextInt();
+        leia.nextLine();
+        
+        Filme filme = filmeDAO.buscarFilmePorId(id);
+        if(filme == null) {
+            System.out.println("Filme não encontrado.");
+            menuFilmes();
+            return;
+        } else {
+            System.out.println("-----------------------");
+            System.out.println("Filme encontrado: ");
+            System.out.println("ID: " + filme.getId());
+            System.out.println("Título: " + filme.getTitulo());
+            System.out.println("Data de Lançamento: " + filme.getDataLancamento());
+            System.out.println("Gênero: " + filme.getGenero());
+            System.out.println("Valor: " + filme.getValor());
+            System.out.println("-----------------------");
+        }
+        System.out.println("Qual informação deseja alterar?");
+        System.out.println("1 - Título");
+        System.out.println("2 - Data de Lançamento");
+        System.out.println("3 - Gênero");
+        System.out.println("4 - Valor");
+        int opcao = leia.nextInt();
+        leia.nextLine();
+        switch (opcao) {
+            case 1:
+                System.out.println("Digite o novo título: ");
+                String novoTitulo = leia.nextLine();
+                filme.setTitulo(novoTitulo);
+                break;
+            case 2:
+                System.out.println("Digite a nova data de lançamento (AAAA-MM-DD): ");
+                String novaData = leia.nextLine();
+                filme.setDataLancamento(Date.valueOf(novaData));
+                break;
+            case 3:
+                System.out.println("Digite o novo gênero: ");
+                int novoGenero = leia.nextInt();
+                filme.setGenero(novoGenero);
+                break;
+            case 4:
+                System.out.println("Digite o novo valor: ");
+                float novoValor = leia.nextFloat();
+                filme.setValor(novoValor);
+                break;
+            case 5:
+                System.out.println("Digite o novo título: ");
+                filme.setTitulo(leia.nextLine());
+                System.out.println("Digite a nova data de lançamento (AAAA-MM-DD): ");
+                filme.setDataLancamento(Date.valueOf(leia.nextLine()));
+                System.out.println("Digite o novo gênero: ");
+                filme.setGenero(leia.nextInt());
+                System.out.println("Digite o novo valor: ");
+                filme.setValor(leia.nextFloat());
+            default:
+                System.out.println("Opção inválida.");
+                return;
+        }
+
         
     }
     public static void excluirFilme(){
+        listarFilme();
+        System.out.println("Digite o ID do filme que deseja excluir: ");
+        int id = leia.nextInt();
+        if(new FilmeDAO().excluirFilme(id)){
+            System.out.println("Filme excluído com sucesso!");
+        } else {
+            System.out.println("Não foi possível excluir o filme.");
+        }
         
     }
 
     //----------Gênero----------------
     public static void inserirGenero(){
-        
+        System.out.println("Digite o tipo de gênero: ");
+        leia.nextLine();
+        String tipoGenero = leia.nextLine();
+
+        Genero novoGenero = new Genero();
+        novoGenero.setTipo_genero(tipoGenero);
+
+        if(new GeneroDAO().criarGenero(novoGenero)){
+            System.out.println("Gênero cadastrado com sucesso!");
+        } else {
+            System.out.println("Não foi possível cadastrar o gênero.");
+        }
     }
     public static void listarGeneros(){
         ArrayList<Genero> listaGeneros = new ArrayList<>();
