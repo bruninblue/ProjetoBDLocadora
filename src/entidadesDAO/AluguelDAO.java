@@ -38,17 +38,17 @@ public class AluguelDAO {
         }
     }
 
-    public Aluguel listarAluguelPorId(int id) {
-        String sql = "SELECT * FROM locacao WHERE id = ?";
+    public Aluguel listarAluguelPorId(int idLocacao) {
+        String sql = "SELECT * FROM locacao WHERE idLocacao = ?";
         Aluguel aluguel = null;
 
         try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setInt(1, idLocacao);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 aluguel = new Aluguel();
-                aluguel.setId(rs.getInt("id"));
+                aluguel.setId(rs.getInt("idLocacao"));
                 aluguel.setDataAluguel(rs.getDate("data_alugado"));
                 aluguel.setDataDevolucao(rs.getDate("data_devolvido"));
                 aluguel.setValorPagar(rs.getFloat("valor_final"));
@@ -70,17 +70,17 @@ public class AluguelDAO {
         String sql = "SELECT * FROM locacao";
 
         try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Aluguel aluguel = new Aluguel();
-                aluguel.setId(rs.getInt("id"));
+                aluguel.setId(rs.getInt("idLocacao"));
                 aluguel.setDataAluguel(rs.getDate("data_alugado"));
                 aluguel.setDataDevolucao(rs.getDate("data_devolvido"));
                 aluguel.setValorPagar(rs.getFloat("valor_final"));
                 aluguel.setMulta(rs.getFloat("multa"));
                 aluguel.setPendente(rs.getInt("pendente"));
-                aluguel.setClienteCpf(rs.getString("cliente_cpf")); // convertendo CPF para int
+                aluguel.setClienteCpf(rs.getString("cliente_cpf"));
 
                 lista.add(aluguel);
             }
@@ -93,13 +93,13 @@ public class AluguelDAO {
     }
 
     // Método útil para atualizar o valor final ou marcar como finalizado
-    public boolean atualizarValorFinalEMulta(int idAluguel, float valorFinal, float multa, int pendente) {
-        String sql = "UPDATE locacao SET valor_final = ?, multa = ?, pendente = ? WHERE id = ?";
+    public boolean atualizarValorFinalEMulta(int idLocacao, float valorFinal, float multa, int pendente) {
+        String sql = "UPDATE locacao SET valor_final = ?, multa = ?, pendente = ? WHERE idLocacao = ?";
         try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql)) {
             ps.setFloat(1, valorFinal);
             ps.setFloat(2, multa);
             ps.setInt(3, pendente);
-            ps.setInt(4, idAluguel);
+            ps.setInt(4, idLocacao);
 
             ps.executeUpdate();
             ps.close();
@@ -111,14 +111,13 @@ public class AluguelDAO {
         }
     }
 
-    public boolean excluirAluguel(int idAluguel) {
-        String sql = "DELETE FROM locacao WHERE id = ?";
-
+    public boolean excluirAluguel(int idLocacao) {
+        String sql = "DELETE FROM locacao WHERE idLocacao = ?";
         PreparedStatement ps = null;
 
         try {
             ps = Conexao.getConexao().prepareStatement(sql);
-            ps.setInt(1, idAluguel);
+            ps.setInt(1, idLocacao);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {

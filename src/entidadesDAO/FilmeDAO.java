@@ -48,10 +48,11 @@ public class FilmeDAO {
             ResultSet resultado = ps.executeQuery();
             while (resultado.next()) {
                 Filme filme = new Filme();
-                filme.setTitulo(resultado.getString("titulo"));
+                filme.setId(resultado.getInt("idFilme"));
+                filme.setTitulo(resultado.getString("nome_filme"));
                 filme.setDataLancamento(resultado.getDate("data_lancamento"));
-                filme.setGenero(resultado.getInt("genero"));
-                filme.setValor(resultado.getFloat("valor"));
+                filme.setGenero(resultado.getInt("genero_filme"));
+                filme.setValor(resultado.getFloat("valor_filme"));
 
                 listaFilmes.add(filme);
             }
@@ -62,7 +63,7 @@ public class FilmeDAO {
 
         return listaFilmes;
     }
- 
+
     public boolean alterarDadosFilme(Filme filme, int opcaoAlterar) {
         StringBuilder query = new StringBuilder("UPDATE FILME SET ");
 
@@ -70,27 +71,25 @@ public class FilmeDAO {
 
         switch (opcaoAlterar) {
             case 1:
-                query.append("titulo = ?");
+                query.append("nome_filme = ?");
                 break;
             case 2:
-                query.append("data_lancamento = ?");    
+                query.append("data_lancamento = ?");
                 break;
             case 3:
-                query.append("genero = ?");
+                query.append("genero_filme = ?");
                 break;
             case 4:
-                query.append("valor = ?");
+                query.append("valor_filme = ?");
                 break;
             case 5:
-                query.append("titulo = ?, data_lancamento = ?, genero = ?, valor = ?");
+                query.append("nome_filme = ?, data_lancamento = ?, genero_filme = ?, valor_filme = ?");
         }
 
-        query.append(" WHERE id = ?");
-
+        query.append(" WHERE idFilme = ?");
 
         try {
             ps = Conexao.getConexao().prepareStatement(query.toString());
-
 
             int i = 1;
             switch (opcaoAlterar) {
@@ -128,7 +127,7 @@ public class FilmeDAO {
     }
 
     public boolean excluirFilme(int id) {
-        String query = "DELETE FROM FILME WHERE id = ?";
+        String query = "DELETE FROM FILME WHERE idFilme = ?";
 
         PreparedStatement ps = null;
 
@@ -149,7 +148,7 @@ public class FilmeDAO {
     }
 
     public Filme buscarFilmePorId(int id) {
-        String query = "SELECT * FROM FILME WHERE id = ?";
+        String query = "SELECT * FROM FILME WHERE idFilme = ?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         Filme filme = null;
@@ -161,11 +160,11 @@ public class FilmeDAO {
 
             if (rs.next()) {
                 filme = new Filme();
-                filme.setId(rs.getInt("id"));
-                filme.setTitulo(rs.getString("titulo"));
+                filme.setId(rs.getInt("idFilme"));
+                filme.setTitulo(rs.getString("nome_filme"));
                 filme.setDataLancamento(rs.getDate("data_lancamento"));
-                filme.setGenero(rs.getInt("genero"));
-                filme.setValor(rs.getFloat("valor"));
+                filme.setGenero(rs.getInt("genero_filme"));
+                filme.setValor(rs.getFloat("valor_filme"));
             }
 
             ps.close();
