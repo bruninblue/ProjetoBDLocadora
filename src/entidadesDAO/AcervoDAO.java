@@ -25,6 +25,29 @@ public class AcervoDAO {
         return true;
     }
 
+    public Acervo buscarAcervoPorId(int idAcervo) {
+        String sql = "SELECT * FROM acervo WHERE idAcervo = ?";
+        Acervo acervo = null;
+
+        try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql)) {
+            ps.setInt(1, idAcervo);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                acervo = new Acervo();
+                acervo.setIdAcervo(rs.getInt("idAcervo"));
+                acervo.setFilmeId(rs.getInt("filme_id"));
+                acervo.setSituacao(Acervo.Situacao.valueOf(rs.getString("situacao")));
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar acervo por ID: " + e.getMessage());
+        }
+
+        return acervo;
+    }
+
     public ArrayList<Acervo> listarAcervos() {
         ArrayList<Acervo> lista = new ArrayList<>();
         String query = "SELECT * FROM acervo";

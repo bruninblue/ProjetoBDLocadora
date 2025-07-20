@@ -38,12 +38,39 @@ public class AluguelDAO {
         }
     }
 
+    public Aluguel listarAluguelPorId(int id) {
+        String sql = "SELECT * FROM locacao WHERE id = ?";
+        Aluguel aluguel = null;
+
+        try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                aluguel = new Aluguel();
+                aluguel.setId(rs.getInt("id"));
+                aluguel.setDataAluguel(rs.getDate("data_alugado"));
+                aluguel.setDataDevolucao(rs.getDate("data_devolvido"));
+                aluguel.setValorPagar(rs.getFloat("valor_final"));
+                aluguel.setMulta(rs.getFloat("multa"));
+                aluguel.setPendente(rs.getInt("pendente"));
+                aluguel.setClienteCpf(rs.getString("cliente_cpf"));
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar aluguel por ID: " + e.getMessage());
+        }
+
+        return aluguel;
+    }
+
     public ArrayList<Aluguel> listarAlugueis() {
         ArrayList<Aluguel> lista = new ArrayList<>();
         String sql = "SELECT * FROM locacao";
 
         try (PreparedStatement ps = Conexao.getConexao().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Aluguel aluguel = new Aluguel();
