@@ -33,7 +33,8 @@ public class App {
             System.out.println("2 - Filmes");
             System.out.println("3 - Aluguel");
             System.out.println("4 - Gêneros");
-            System.out.println("5 - Sair");
+            System.out.println("5 - Acervo");
+            System.out.println("6 - Sair");
 
             System.out.println("Digite uma opção: ");
             opcao = leia.nextInt();
@@ -51,6 +52,10 @@ public class App {
                 case 4:
                     menuGeneros();
                     break;
+                case 5:
+                    menuAcervo();
+                default:
+                    return;
             }
         }
     }
@@ -92,28 +97,37 @@ public class App {
     }
 
     public static void menuFilmes() {
-        System.out.println("Menu de Filmes");
-        System.out.println("1 - Cadastrar novo filme");
-        System.out.println("2 - Listar filmes cadastrados");
-        System.out.println("3 - Alterar dados do filme");
-        System.out.println("4 - Excluir filme");
+        int opcao = 0;
+        do {
+            System.out.println("\n--- MENU DE FILMES ---");
+            System.out.println("1 - Cadastrar novo filme");
+            System.out.println("2 - Listar filmes cadastrados");
+            System.out.println("3 - Alterar dados do filme");
+            System.out.println("4 - Excluir filme");
+            System.out.println("5 - Voltar ao menu principal");
 
-        int opcao = leia.nextInt();
+            System.out.print("Digite uma opção: ");
+            opcao = leia.nextInt();
 
-        switch (opcao) {
-            case 1:
-                inserirFilme();
-                break;
-            case 2:
-                listarFilme();
-                break;
-            case 3:
-                alterarFilme();
-                break;
-            case 4:
-                excluirFilme();
-        }
-
+            switch (opcao) {
+                case 1:
+                    inserirFilme();
+                    break;
+                case 2:
+                    listarFilme();
+                    break;
+                case 3:
+                    alterarFilme();
+                    break;
+                case 4:
+                    excluirFilme();
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (true);
     }
 
     public static void menuAluguel() {
@@ -132,13 +146,13 @@ public class App {
 
             switch (opcao) {
                 case 1:
-                    // realizarLocacao();
+                    realizarLocacao();
                     break;
                 case 2:
-                    // realizarDevolucao();
+                    realizarDevolucao();
                     break;
                 case 3:
-                    // listarAlugueis();
+                    listarLocacoes();
                     break;
                 case 4:
                     // excluirLocacao();
@@ -152,21 +166,33 @@ public class App {
     }
 
     public static void menuGeneros() {
-        System.out.println("Menu de Gêneros");
-        System.out.println("1 - Criar um novo gênero");
-        System.out.println("2 - Listar gênero");
-        System.out.println("3 - Deletar gênero");
+        int opcao = 0;
+        do {
+            System.out.println("\n--- MENU DE GÊNEROS ---");
+            System.out.println("1 - Criar um novo gênero");
+            System.out.println("2 - Listar gêneros");
+            System.out.println("3 - Deletar gênero");
+            System.out.println("4 - Voltar ao menu principal");
 
-        int opcao = leia.nextInt();
+            System.out.print("Digite uma opção: ");
+            opcao = leia.nextInt();
 
-        switch (opcao) {
-            case 1:
-                // criarGenero();
-                break;
-            case 2:
-                listarGeneros();
-                break;
-        }
+            switch (opcao) {
+                case 1:
+                    inserirGenero();
+                    break;
+                case 2:
+                    listarGeneros();
+                    break;
+                case 3:
+                    deletarGenero();
+                    break;
+                case 4:
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (true);
     }
 
     // -----------Cliente--------------
@@ -325,15 +351,19 @@ public class App {
 
     public static void listarFilme() {
         List<Filme> listaFilmes = new FilmeDAO().listarFilmes();
+        GeneroDAO generoDAO = new GeneroDAO();
+
         if (listaFilmes.isEmpty()) {
             System.out.println("Nenhum filme cadastrado.");
         } else {
             for (Filme filme : listaFilmes) {
+                Genero genero = generoDAO.buscarGeneroPorId(filme.getGenero());
+                String tipoGenero = (genero != null) ? genero.getTipo_genero() : "Desconhecido";
                 System.out.println("-----------------------");
                 System.out.println("ID: " + filme.getId());
                 System.out.println("Título: " + filme.getTitulo());
                 System.out.println("Data de Lançamento: " + filme.getDataLancamento());
-                System.out.println("Gênero: " + filme.getGenero());
+                System.out.println("Gênero: " + tipoGenero);
                 System.out.println("Valor: " + filme.getValor());
             }
         }
@@ -426,6 +456,17 @@ public class App {
         leia.nextLine();
         String tipoGenero = leia.nextLine();
 
+        // Verifica se já existe um gênero com esse nome (ignorando
+        // maiúsculas/minúsculas)
+        ArrayList<Genero> listaGeneros = new GeneroDAO().listarGeneros();
+        boolean existe = listaGeneros.stream()
+                .anyMatch(g -> g.getTipo_genero().equalsIgnoreCase(tipoGenero));
+
+        if (existe) {
+            System.out.println("Já existe um gênero com esse nome cadastrado!");
+            return;
+        }
+
         Genero novoGenero = new Genero();
         novoGenero.setTipo_genero(tipoGenero);
 
@@ -447,8 +488,43 @@ public class App {
         }
     }
 
-    public static void deletarGênero() {
+    public static void deletarGenero() {
+        GeneroDAO generoDAO = new GeneroDAO();
+        ArrayList<Genero> listaGeneros = generoDAO.listarGeneros();
 
+        if (listaGeneros.isEmpty()) {
+            System.out.println("Nenhum gênero cadastrado para excluir.");
+            return;
+        }
+
+        System.out.println("\n--- Gêneros Cadastrados ---");
+        for (Genero gen : listaGeneros) {
+            System.out.println("ID: " + gen.getId() + " | Tipo: " + gen.getTipo_genero());
+        }
+
+        System.out.print("Digite o ID do gênero que deseja excluir: ");
+        int id = leia.nextInt();
+
+        Genero generoSelecionado = generoDAO.buscarGeneroPorId(id);
+        if (generoSelecionado == null) {
+            System.out.println("Gênero com ID informado não encontrado.");
+            return;
+        }
+
+        System.out
+                .print("Tem certeza que deseja excluir o gênero '" + generoSelecionado.getTipo_genero() + "'? (s/n): ");
+        leia.nextLine(); // limpa buffer
+        String confirmacao = leia.nextLine();
+
+        if (confirmacao.equalsIgnoreCase("s")) {
+            if (generoDAO.excluirGenero(id)) {
+                System.out.println("Gênero excluído com sucesso.");
+            } else {
+                System.out.println("Erro ao excluir o gênero.");
+            }
+        } else {
+            System.out.println("Exclusão cancelada.");
+        }
     }
 
     // ----------Aluguel----------------
@@ -616,6 +692,144 @@ public class App {
         if (multa > 0) {
             System.out.println("Multa por atraso: R$" + multa);
         }
+    }
+
+    public static void listarLocacoes() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ClienteDAO clienteDAO = new ClienteDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+        ItemLocacaoDAO itemDAO = new ItemLocacaoDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+
+        ArrayList<Aluguel> alugueis = aluguelDAO.listarAlugueis();
+        ArrayList<Cliente> clientes = clienteDAO.listarClientes();
+
+        if (alugueis.isEmpty()) {
+            System.out.println("Nenhuma locação encontrada.");
+            return;
+        }
+
+        for (Aluguel aluguel : alugueis) {
+            System.out.println("\n=============================");
+            System.out.println("ID Locação: " + aluguel.getId());
+            System.out.println("CPF Cliente: " + aluguel.getClienteCpf());
+
+            Cliente cli = clientes.stream()
+                    .filter(c -> c.getCpf().equals(aluguel.getClienteCpf()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (cli != null) {
+                System.out.println("Nome: " + cli.getNomeCompleto());
+            }
+
+            System.out.println("Data Aluguel: " + aluguel.getDataAluguel());
+            System.out.println("Data Devolução: " + aluguel.getDataDevolucao());
+            System.out.println("Valor Final: R$" + aluguel.getValorPagar());
+            System.out.println("Multa: R$" + aluguel.getMulta());
+            System.out.println("Status: " + (aluguel.getPendente() == 1 ? "PENDENTE" : "DEVOLVIDO"));
+
+            List<ItemLocacao> itens = itemDAO.listarItensPorLocacao(aluguel.getId());
+            if (!itens.isEmpty()) {
+                System.out.println("Filmes alugados:");
+                for (ItemLocacao item : itens) {
+                    Acervo acervo = acervoDAO.buscarAcervoPorId(item.getIdAcervo());
+                    if (acervo != null) {
+                        Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                        System.out.println("  - " + (filme != null ? filme.getTitulo() : "Filme não encontrado"));
+                    }
+                }
+            } else {
+                System.out.println("Nenhum item associado à locação.");
+            }
+        }
+    }
+    
+    public static void menuAcervo() {
+        AcervoDAO acervoDAO = new AcervoDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+        int opcao = 0;
+
+        do {
+            System.out.println("\n--- MENU DE ACERVO ---");
+            System.out.println("1 - Cadastrar novo exemplar de filme");
+            System.out.println("2 - Listar exemplares (acervo)");
+            System.out.println("3 - Alterar situação de um exemplar");
+            System.out.println("4 - Excluir exemplar");
+            System.out.println("5 - Voltar ao menu principal");
+
+            System.out.print("Digite uma opção: ");
+            opcao = leia.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    listarFilme(); // exibir filmes disponíveis
+                    System.out.print("Digite o ID do filme para adicionar ao acervo: ");
+                    int idFilme = leia.nextInt();
+
+                    Acervo novoAcervo = new Acervo();
+                    novoAcervo.setFilmeId(idFilme);
+                    novoAcervo.setSituacao(Acervo.Situacao.DISPONIVEL);
+
+                    if (acervoDAO.inserirNoAcervo(novoAcervo)) {
+                        System.out.println("Exemplar adicionado ao acervo com sucesso.");
+                    } else {
+                        System.out.println("Erro ao adicionar exemplar.");
+                    }
+                    break;
+
+                case 2:
+                    List<Acervo> acervos = acervoDAO.listarAcervos();
+                    if (acervos.isEmpty()) {
+                        System.out.println("Nenhum exemplar cadastrado no acervo.");
+                    } else {
+                        System.out.println("\n--- Exemplares no Acervo ---");
+                        for (Acervo a : acervos) {
+                            Filme f = filmeDAO.buscarFilmePorId(a.getFilmeId());
+                            System.out.println("ID Acervo: " + a.getIdAcervo() +
+                                    " | Filme: " + (f != null ? f.getTitulo() : "Desconhecido") +
+                                    " | Situação: " + a.getSituacao());
+                        }
+                    }
+                    break;
+
+                case 3:
+                    System.out.print("Digite o ID do acervo que deseja alterar: ");
+                    int idAlterar = leia.nextInt();
+
+                    System.out.println("Selecione a nova situação:");
+                    System.out.println("1 - DISPONIVEL");
+                    System.out.println("2 - ALUGADO");
+                    int situacao = leia.nextInt();
+                    Acervo.Situacao novaSituacao = (situacao == 2) ? Acervo.Situacao.ALUGADO
+                            : Acervo.Situacao.DISPONIVEL;
+
+                    if (acervoDAO.alterarSituacao(idAlterar, novaSituacao)) {
+                        System.out.println("Situação alterada com sucesso.");
+                    } else {
+                        System.out.println("Erro ao alterar situação.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("Digite o ID do acervo que deseja excluir: ");
+                    int idExcluir = leia.nextInt();
+
+                    if (acervoDAO.deletarAcervo(idExcluir)) {
+                        System.out.println("Exemplar excluído com sucesso.");
+                    } else {
+                        System.out.println("Erro ao excluir exemplar.");
+                    }
+                    break;
+
+                case 5:
+                    return;
+
+                default:
+                    System.out.println("Opção inválida.");
+            }
+
+        } while (true);
     }
 
 }
