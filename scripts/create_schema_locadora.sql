@@ -31,23 +31,33 @@ CREATE TABLE filme (
 
 -- Tabela: locacao
 CREATE TABLE locacao (
-  id INT NOT NULL AUTO_INCREMENT,
-  Filme_idFilme INT NOT NULL,
+  idLocacao INT NOT NULL AUTO_INCREMENT,
   data_alugado DATE NOT NULL,
   data_devolvido DATE NOT NULL,
-  valor_pagar DECIMAL(5, 2) NOT NULL,
-  pendente TINYINT NOT NULL,
-  cliente_cpf VARCHAR(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
-  locacaocol VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
-  PRIMARY KEY (id),
-  KEY fk_FilmesXcliente_Filme1_idx (Filme_idFilme),
-  CONSTRAINT fk_FilmesXcliente_Filme1 FOREIGN KEY (Filme_idFilme) REFERENCES filme (idFilme)
+  valor_final DECIMAL(5, 2) DEFAULT 0.00 CHECK (valor_final >= 0),
+  multa DECIMAL(5, 2) DEFAULT 0.00 CHECK (multa >= 0),
+  pendente TINYINT NOT NULL, -- 0 = locação finalizada, 1 = pendente
+  cliente_cpf VARCHAR(12) NOT NULL,
+  PRIMARY KEY (idLocacao),
+  FOREIGN KEY (cliente_cpf) REFERENCES cliente(cpf)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_520_ci;
+
+-- Tabela: acervo
+CREATE TABLE acervo (
+  idAcervo INT NOT NULL AUTO_INCREMENT,
+  filme_id INT NOT NULL,
+  situacao ENUM('DISPONIVEL', 'ALUGADO', 'DANIFICADO') DEFAULT 'DISPONIVEL',
+  PRIMARY KEY (idAcervo),
+  FOREIGN KEY (filme_id) REFERENCES filme (idFilme)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_520_ci;
 
 -- Tabela: itemlocacao
 CREATE TABLE itemlocacao (
-  id INT NOT NULL AUTO_INCREMENT,
-  LocacaoId INT NOT NULL,
-  FilmeId INT NOT NULL,
-  PRIMARY KEY (id)
+  idItemLocacao INT NOT NULL AUTO_INCREMENT,
+  idLocacao INT NOT NULL,
+  idAcervo INT NOT NULL,
+  PRIMARY KEY (idItemLocacao),
+  FOREIGN KEY (idLocacao) REFERENCES locacao(idLocacao) ON DELETE CASCADE,
+  FOREIGN KEY (idAcervo) REFERENCES acervo(idAcervo)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_520_ci;
+

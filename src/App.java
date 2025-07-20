@@ -6,32 +6,39 @@ import utils.Utils;
 import entidades.Cliente;
 import entidades.Filme;
 import entidades.Genero;
+import entidades.Aluguel;
+import entidades.Acervo;
+import entidades.ItemLocacao;
 import entidadesDAO.ClienteDAO;
 import entidadesDAO.FilmeDAO;
 import entidadesDAO.GeneroDAO;
+import entidadesDAO.AluguelDAO;
+import entidadesDAO.AcervoDAO;
+import entidadesDAO.ItemLocacaoDAO;
+
 public class App {
-    
+
     public static Scanner leia = new Scanner(System.in);
-    
-    public static void main (String[] args){
+
+    public static void main(String[] args) {
         menuPrincipal();
     }
 
-    public static void menuPrincipal(){
+    public static void menuPrincipal() {
         int opcao = 0;
 
-        while(opcao != 5){
+        while (opcao != 5) {
             System.out.println("Bem-vindo a locadora de filmes, qual a sua categoria?");
             System.out.println("1 - Cliente");
             System.out.println("2 - Filmes");
             System.out.println("3 - Aluguel");
             System.out.println("4 - Gêneros");
             System.out.println("5 - Sair");
-            
+
             System.out.println("Digite uma opção: ");
             opcao = leia.nextInt();
-            
-            switch(opcao){
+
+            switch (opcao) {
                 case 1:
                     menuCliente();
                     break;
@@ -47,11 +54,12 @@ public class App {
             }
         }
     }
-    public static void menuCliente(){
-        
+
+    public static void menuCliente() {
+
         int opcao = 0;
 
-        do{
+        do {
             System.out.println("Menu de Cliente");
             System.out.println("1 - Cadastrar novo cliente");
             System.out.println("2 - Listar clientes cadastrados");
@@ -62,7 +70,7 @@ public class App {
             System.out.println("Digite uma opção: ");
             opcao = leia.nextInt();
 
-            switch(opcao){
+            switch (opcao) {
                 case 1:
                     inserirCliente();
                     break;
@@ -79,10 +87,11 @@ public class App {
                     menuPrincipal();
                     break;
             }
-        }while(opcao < 1 || opcao > 5);
-        
+        } while (opcao < 1 || opcao > 5);
+
     }
-    public static void menuFilmes(){
+
+    public static void menuFilmes() {
         System.out.println("Menu de Filmes");
         System.out.println("1 - Cadastrar novo filme");
         System.out.println("2 - Listar filmes cadastrados");
@@ -98,47 +107,79 @@ public class App {
             case 2:
                 listarFilme();
                 break;
-            case 3: 
+            case 3:
                 alterarFilme();
                 break;
             case 4:
                 excluirFilme();
         }
-        
-    }
-
-    public static void menuAluguel(){
 
     }
 
-    public static void menuGeneros(){
+    public static void menuAluguel() {
+        int opcao = 0;
+
+        do {
+            System.out.println("\n--- MENU DE ALUGUEL ---");
+            System.out.println("1 - Realizar nova locação");
+            System.out.println("2 - Realizar devolução");
+            System.out.println("3 - Listar locações");
+            System.out.println("4 - Excluir locação");
+            System.out.println("5 - Voltar ao menu principal");
+
+            System.out.print("Digite uma opção: ");
+            opcao = leia.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    // realizarLocacao();
+                    break;
+                case 2:
+                    // realizarDevolucao();
+                    break;
+                case 3:
+                    // listarAlugueis();
+                    break;
+                case 4:
+                    // excluirLocacao();
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        } while (true);
+    }
+
+    public static void menuGeneros() {
         System.out.println("Menu de Gêneros");
         System.out.println("1 - Criar um novo gênero");
         System.out.println("2 - Listar gênero");
         System.out.println("3 - Deletar gênero");
 
         int opcao = leia.nextInt();
-        
+
         switch (opcao) {
             case 1:
-                //criarGenero();
+                // criarGenero();
                 break;
             case 2:
                 listarGeneros();
                 break;
         }
     }
-    //-----------Cliente--------------
-    public static void inserirCliente(){
-        //Adicionar verificações
+
+    // -----------Cliente--------------
+    public static void inserirCliente() {
+        // Adicionar verificações
         System.out.println("Digite seu CPF: ");
-        leia.nextLine(); //limpeza buffer;
+        leia.nextLine(); // limpeza buffer;
         String cpf = leia.nextLine();
 
-        if(Utils.verificarExistenciaCliente(cpf) == 0){
+        if (Utils.verificarExistenciaCliente(cpf) == 0) {
             System.out.println("Digite seu nome completo: ");
             String nome_completo = leia.nextLine();
-            
+
             System.out.println("Digite seu número de telefone: ");
             String telefone = leia.nextLine();
 
@@ -146,22 +187,22 @@ public class App {
             clienteNovo.setCpf(cpf);
             clienteNovo.setNomeCompleto(nome_completo);
             clienteNovo.setNumTelefone(telefone);
-            
-            if(new ClienteDAO().inserirCliente(clienteNovo)){
+
+            if (new ClienteDAO().inserirCliente(clienteNovo)) {
                 System.out.println("Cadastrado com sucesso.");
-            }else{
+            } else {
                 System.out.println("Não foi possível cadastrar o cliente.");
             }
-        }else{
+        } else {
             System.out.println("Um cliente com o CPF digitado já existe no sistema!");
         }
     }
 
-    public static void listarClientes(){
+    public static void listarClientes() {
         ArrayList<Cliente> clientes = new ArrayList<>();
         clientes = new ClienteDAO().listarClientes();
 
-        for(Cliente cli : clientes){
+        for (Cliente cli : clientes) {
             System.out.println("--------------------------------");
             System.out.println("Nome: " + cli.getNomeCompleto());
             System.out.println("CPF: " + cli.getCpf());
@@ -170,26 +211,26 @@ public class App {
 
     }
 
-    public static void excluirCliente(){
+    public static void excluirCliente() {
         System.out.println("Digite o CPF do cliente que deseja deletar do sistema: ");
-        leia.nextLine();//limpar buffer
+        leia.nextLine();// limpar buffer
         String cpf = leia.nextLine();
 
-        if(Utils.verificarExistenciaCliente(cpf) == 1){
+        if (Utils.verificarExistenciaCliente(cpf) == 1) {
 
-            if(new ClienteDAO().deletarCliente(cpf)){
+            if (new ClienteDAO().deletarCliente(cpf)) {
                 System.out.println("Exclusão feita com sucesso!");
-            }else{
+            } else {
                 System.out.println("Não foi possível deletar o cliente!");
             }
 
-        }else{
+        } else {
 
             System.out.println("Não foi possível encontrar o CPF digitado!");
         }
     }
 
-    public static void alterarCliente(){
+    public static void alterarCliente() {
         System.out.println("Qual informação deseja altera?");
         System.out.println("1 - Nome completo");
         System.out.println("2 - Número de telefone");
@@ -197,38 +238,36 @@ public class App {
         int opcao = leia.nextInt();
 
         System.out.println("Qual o cpf do cliente que deseja alterar?");
-        leia.nextLine();//limpar buffer
+        leia.nextLine();// limpar buffer
         String cpf = leia.nextLine();
 
-        if(Utils.verificarExistenciaCliente(cpf) == 1){
-            if(opcao == 1){
+        if (Utils.verificarExistenciaCliente(cpf) == 1) {
+            if (opcao == 1) {
                 System.out.println("Digite o novo nome completo: ");
                 String novoNome = leia.nextLine();
                 Cliente cli = new Cliente();
                 cli.setCpf(cpf);
                 cli.setNomeCompleto(novoNome);
 
-                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                if (new ClienteDAO().alterarDadosCliente(cli, opcao)) {
                     System.out.println("Alteração feita com sucesso");
-                }else{
+                } else {
                     System.out.println("Não foi possível realizar a alteração");
                 }
-                
-            }
-            else if(opcao == 2){
+
+            } else if (opcao == 2) {
                 System.out.println("Digite o novo número de telefone: ");
                 String novoTelefone = leia.nextLine();
                 Cliente cli = new Cliente();
                 cli.setCpf(cpf);
                 cli.setNumTelefone(novoTelefone);
 
-                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                if (new ClienteDAO().alterarDadosCliente(cli, opcao)) {
                     System.out.println("Alteração feita com sucesso");
-                }else{
+                } else {
                     System.out.println("Não foi possível realizar a alteração");
                 }
-            }
-            else if(opcao == 3){
+            } else if (opcao == 3) {
                 System.out.println("Digite o novo nome completo: ");
                 String novoNome = leia.nextLine();
                 System.out.println("Digite o novo número de telefone");
@@ -238,21 +277,20 @@ public class App {
                 cli.setNomeCompleto(novoNome);
                 cli.setNumTelefone(novoTelefone);
 
-                if(new ClienteDAO().alterarDadosCliente(cli, opcao)){
+                if (new ClienteDAO().alterarDadosCliente(cli, opcao)) {
                     System.out.println("Alteração feita com sucesso");
-                }else{
+                } else {
                     System.out.println("Não foi possível realizar a alteração!");
                 }
             }
-        }else{
+        } else {
             System.out.println("CPF digitado não foi encontrado");
-        } 
-        
-    }
-    
+        }
 
-    //----------Filmes-----------------
-    public static void inserirFilme(){
+    }
+
+    // ----------Filmes-----------------
+    public static void inserirFilme() {
         System.out.println("Digite o título do filme: ");
         leia.nextLine();
         String titulo = leia.nextLine();
@@ -266,9 +304,8 @@ public class App {
         GeneroDAO generoDAO = new GeneroDAO();
         while (generoDAO.buscarGeneroPorId(genero) == null) {
             System.out.println("Gênero não encontrado. Por favor, digite um ID de gênero válido: ");
-            genero = leia.nextInt();            
+            genero = leia.nextInt();
         }
-
 
         System.out.println("Digite o valor do aluguel do filme: ");
         float valor = leia.nextFloat();
@@ -279,18 +316,19 @@ public class App {
         novoFilme.setGenero(genero);
         novoFilme.setValor(valor);
 
-        if(new FilmeDAO().criarFilme(novoFilme)){
+        if (new FilmeDAO().criarFilme(novoFilme)) {
             System.out.println("Filme cadastrado com sucesso!");
         } else {
             System.out.println("Não foi possível cadastrar o filme.");
         }
     }
-    public static void listarFilme(){
+
+    public static void listarFilme() {
         List<Filme> listaFilmes = new FilmeDAO().listarFilmes();
-        if(listaFilmes.isEmpty()){
+        if (listaFilmes.isEmpty()) {
             System.out.println("Nenhum filme cadastrado.");
         } else {
-            for(Filme filme : listaFilmes){
+            for (Filme filme : listaFilmes) {
                 System.out.println("-----------------------");
                 System.out.println("ID: " + filme.getId());
                 System.out.println("Título: " + filme.getTitulo());
@@ -300,18 +338,19 @@ public class App {
             }
         }
     }
-    public static void alterarFilme(){
+
+    public static void alterarFilme() {
         listarFilme();
-        
+
         FilmeDAO filmeDAO = new FilmeDAO();
 
         System.out.println("-----------------------");
         System.out.println("Digite o ID do filme que deseja alterar: ");
         int id = leia.nextInt();
         leia.nextLine();
-        
+
         Filme filme = filmeDAO.buscarFilmePorId(id);
-        if(filme == null) {
+        if (filme == null) {
             System.out.println("Filme não encontrado.");
             menuFilmes();
             return;
@@ -367,22 +406,22 @@ public class App {
                 return;
         }
 
-        
     }
-    public static void excluirFilme(){
+
+    public static void excluirFilme() {
         listarFilme();
         System.out.println("Digite o ID do filme que deseja excluir: ");
         int id = leia.nextInt();
-        if(new FilmeDAO().excluirFilme(id)){
+        if (new FilmeDAO().excluirFilme(id)) {
             System.out.println("Filme excluído com sucesso!");
         } else {
             System.out.println("Não foi possível excluir o filme.");
         }
-        
+
     }
 
-    //----------Gênero----------------
-    public static void inserirGenero(){
+    // ----------Gênero----------------
+    public static void inserirGenero() {
         System.out.println("Digite o tipo de gênero: ");
         leia.nextLine();
         String tipoGenero = leia.nextLine();
@@ -390,24 +429,193 @@ public class App {
         Genero novoGenero = new Genero();
         novoGenero.setTipo_genero(tipoGenero);
 
-        if(new GeneroDAO().criarGenero(novoGenero)){
+        if (new GeneroDAO().criarGenero(novoGenero)) {
             System.out.println("Gênero cadastrado com sucesso!");
         } else {
             System.out.println("Não foi possível cadastrar o gênero.");
         }
     }
-    public static void listarGeneros(){
+
+    public static void listarGeneros() {
         ArrayList<Genero> listaGeneros = new ArrayList<>();
         listaGeneros = new GeneroDAO().listarGeneros();
 
-        for(Genero gen : listaGeneros){
+        for (Genero gen : listaGeneros) {
             System.out.println("-----------------------");
             System.out.println("ID: " + gen.getId());
             System.out.println("Tipo: " + gen.getTipo_genero());
         }
     }
-    public static void deletarGênero(){
-        
+
+    public static void deletarGênero() {
+
     }
-    
+
+    // ----------Aluguel----------------
+    public static void realizarLocacao() {
+        ClienteDAO clienteDAO = new ClienteDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ItemLocacaoDAO itemLocacaoDAO = new ItemLocacaoDAO();
+
+        System.out.println("Digite o CPF do cliente: ");
+        leia.nextLine(); // limpar buffer
+        String cpf = leia.nextLine();
+
+        if (Utils.verificarExistenciaCliente(cpf) == 0) {
+            System.out.println("Cliente não encontrado.");
+            return;
+        }
+
+        // Criar o aluguel com data de hoje e devolução em até 7 dias (exemplo)
+        Aluguel aluguel = new Aluguel();
+        aluguel.setClienteCpf(cpf);
+        aluguel.setDataAluguel(new Date(System.currentTimeMillis()));
+        aluguel.setDataDevolucao(Utils.somarDias(7)); // função auxiliar que soma dias
+        aluguel.setValorPagar(0); // será atualizado depois
+        aluguel.setMulta(0);
+        aluguel.setPendente(1); // pendente
+
+        if (!aluguelDAO.inserirAluguel(aluguel)) {
+            System.out.println("Erro ao criar a locação.");
+            return;
+        }
+
+        float total = 0;
+        boolean continuar = true;
+        while (continuar) {
+            System.out.println("\nFilmes disponíveis para locação:");
+            List<Filme> filmes = filmeDAO.listarFilmes();
+            for (Filme filme : filmes) {
+                System.out.println("ID: " + filme.getId() +
+                        " | Título: " + filme.getTitulo() +
+                        " | Valor: R$" + filme.getValor());
+            }
+
+            System.out.print("Digite o ID do filme que deseja alugar: ");
+            int idFilmeEscolhido = leia.nextInt();
+
+            // Buscar acervos DISPONÍVEIS desse filme
+            List<Acervo> acervosDisponiveis = acervoDAO.listarAcervosPorSituacao(Acervo.Situacao.DISPONIVEL)
+                    .stream()
+                    .filter(a -> a.getFilmeId() == idFilmeEscolhido)
+                    .toList();
+
+            if (acervosDisponiveis.isEmpty()) {
+                System.out.println("Não há exemplares disponíveis desse filme para locação.");
+            } else {
+                Acervo acervoParaAlugar = acervosDisponiveis.get(0); // pega o primeiro disponível
+
+                // Inserir em itemlocacao
+                ItemLocacao item = new ItemLocacao();
+                item.setIdLocacao(aluguel.getId());
+                item.setIdAcervo(acervoParaAlugar.getIdAcervo());
+
+                if (itemLocacaoDAO.inserirItemLocacao(item)) {
+                    System.out.println("Filme adicionado à locação!");
+                    total += filmeDAO.buscarFilmePorId(idFilmeEscolhido).getValor();
+
+                    // Atualiza situação para ALUGADO
+                    acervoDAO.alterarSituacao(acervoParaAlugar.getIdAcervo(), Acervo.Situacao.ALUGADO);
+                } else {
+                    System.out.println("Erro ao adicionar item à locação.");
+                }
+            }
+
+            System.out.println("Deseja alugar outro filme? (s/n): ");
+            leia.nextLine(); // limpar buffer
+            String resp = leia.nextLine();
+            continuar = resp.equalsIgnoreCase("s");
+        }
+
+        // Atualizar valor total
+        aluguelDAO.atualizarValorFinalEMulta(aluguel.getId(), total, 0, 1);
+        System.out.println("Locação realizada com sucesso. Valor total: R$" + total);
+    }
+
+    public static void realizarDevolucao() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ItemLocacaoDAO itemLocacaoDAO = new ItemLocacaoDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+
+        System.out.print("Digite o CPF do cliente: ");
+        leia.nextLine(); // limpar buffer
+        String cpf = leia.nextLine();
+
+        if (Utils.verificarExistenciaCliente(cpf) == 0) {
+            System.out.println("Cliente não encontrado.");
+            return;
+        }
+
+        ArrayList<Aluguel> alugueis = aluguelDAO.listarAlugueis();
+        List<Aluguel> alugueisDoCliente = alugueis.stream()
+                .filter(a -> a.getClienteCpf().equals(cpf) && a.getPendente() == 1)
+                .toList();
+
+        if (alugueisDoCliente.isEmpty()) {
+            System.out.println("Este cliente não possui locações pendentes.");
+            return;
+        }
+
+        System.out.println("\nLocações pendentes:");
+        for (Aluguel a : alugueisDoCliente) {
+            System.out.println("\nID Locação: " + a.getId());
+            List<ItemLocacao> itens = itemLocacaoDAO.listarItensPorLocacao(a.getId());
+
+            for (ItemLocacao item : itens) {
+                int idAcervo = item.getIdAcervo();
+                Acervo acervo = acervoDAO.buscarAcervoPorId(idAcervo);
+
+                if (acervo != null) {
+                    Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                    System.out.println("  - Filme: " + filme.getTitulo());
+                }
+            }
+        }
+
+        System.out.print("\nDigite o ID da locação que deseja devolver: ");
+        int idLocacao = leia.nextInt();
+        Aluguel aluguelSelecionado = aluguelDAO.listarAluguelPorId(idLocacao);
+
+        if (aluguelSelecionado == null ||
+                !aluguelSelecionado.getClienteCpf().equals(cpf) ||
+                aluguelSelecionado.getPendente() != 1) {
+            System.out.println("ID de locação inválido.");
+            return;
+        }
+
+        ArrayList<ItemLocacao> itensParaDevolver = itemLocacaoDAO.listarItensPorLocacao(idLocacao);
+        float total = 0;
+
+        for (ItemLocacao item : itensParaDevolver) {
+            int idAcervo = item.getIdAcervo();
+
+            // Liberar acervo
+            acervoDAO.alterarSituacao(idAcervo, Acervo.Situacao.DISPONIVEL);
+
+            // Somar valor do filme
+            Acervo acervo = acervoDAO.buscarAcervoPorId(idAcervo);
+
+            if (acervo != null) {
+                Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                total += filme.getValor();
+            }
+        }
+
+        // Calcular multa (1 real por dia de atraso)
+        long diasAtraso = (System.currentTimeMillis() - aluguelSelecionado.getDataDevolucao().getTime())
+                / (1000 * 60 * 60 * 24);
+        float multa = diasAtraso > 0 ? diasAtraso * 1.0f : 0.0f;
+
+        aluguelDAO.atualizarValorFinalEMulta(idLocacao, total + multa, multa, 0);
+
+        System.out.println("\nDevolução concluída com sucesso!");
+        System.out.println("Valor total da locação: R$" + total);
+        if (multa > 0) {
+            System.out.println("Multa por atraso: R$" + multa);
+        }
+    }
+
 }
