@@ -64,6 +64,34 @@ public class FilmeDAO {
         return listaFilmes;
     }
 
+    public List<Filme> listarFilmesDisponiveis() {
+         List<Filme> listaFilmes = new ArrayList<>();
+        String query = "SELECT f.*, COUNT(a.idAcervo) AS quantidadeDisponivel FROM filme f INNER JOIN acervo a on a.filme_id = f.idFilme WHERE a.situacao = 'DISPONIVEL' group by f.idFilme;";
+
+        PreparedStatement ps = null;
+
+        try {
+            ps = Conexao.getConexao().prepareStatement(query);
+            ResultSet resultado = ps.executeQuery();
+            while (resultado.next()) {
+                Filme filme = new Filme();
+                filme.setId(resultado.getInt("idFilme"));
+                filme.setTitulo(resultado.getString("nome_filme"));
+                filme.setDataLancamento(resultado.getDate("data_lancamento"));
+                filme.setGenero(resultado.getInt("genero_filme"));
+                filme.setValor(resultado.getFloat("valor_filme"));
+                filme.setQuantidadeDisponivel(resultado.getInt("quantidadeDisponivel"));
+
+                listaFilmes.add(filme);
+            }
+            ps.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao consultar: " + e.getMessage());
+        }
+
+        return listaFilmes;
+    }
+
     public boolean alterarDadosFilme(Filme filme, int opcaoAlterar) {
         StringBuilder query = new StringBuilder("UPDATE FILME SET ");
 

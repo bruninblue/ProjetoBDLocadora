@@ -11,6 +11,8 @@ public class Aluguel {
     private float valorPagar;
     private float multa;
     private int pendente;
+    private String cpfCliente;
+    private String clienteNome;
 
     public int getId() {
         return id;
@@ -59,6 +61,18 @@ public class Aluguel {
     }
     public void setPendente(int pendente) {
         this.pendente = pendente;
+    }
+    public String getCpfCliente() {
+        return cpfCliente;
+    }
+    public void setCpfCliente(String cpfCliente) {
+        this.cpfCliente = cpfCliente;
+    }
+    public String getClienteNome() {
+        return clienteNome;
+    }
+    public void setClienteNome(String clienteNome) {
+        this.clienteNome = clienteNome;
     }
 
     

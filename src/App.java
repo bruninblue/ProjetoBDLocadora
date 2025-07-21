@@ -1,6 +1,7 @@
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import utils.Utils;
 import entidades.Cliente;
@@ -138,8 +139,11 @@ public class App {
             System.out.println("1 - Realizar nova locação");
             System.out.println("2 - Realizar devolução");
             System.out.println("3 - Listar locações");
-            System.out.println("4 - Excluir locação");
-            System.out.println("5 - Voltar ao menu principal");
+            System.out.println("4 - Listar locações pendentes");
+            System.out.println("5 - Listar locações atrasadas");
+            System.out.println("6 - Listar locações por cliente");
+            System.out.println("7 - Excluir locação");
+            System.out.println("8 - Voltar ao menu principal");
 
             System.out.print("Digite uma opção: ");
             opcao = leia.nextInt();
@@ -155,9 +159,18 @@ public class App {
                     listarLocacoes();
                     break;
                 case 4:
-                    // excluirLocacao();
+                    listarLocacoesPendentes();
                     break;
                 case 5:
+                    listaLocacoesAtrasadas();
+                    break;
+                case 6:
+                    listaLocacoesPorCliente();
+                    break;
+                case 7:
+                    // excluirLocacao();
+                    break;
+                case 8:
                     return;
                 default:
                     System.out.println("Opção inválida.");
@@ -553,61 +566,78 @@ public class App {
         aluguel.setMulta(0);
         aluguel.setPendente(1); // pendente
 
-        if (!aluguelDAO.inserirAluguel(aluguel)) {
+        List<Filme> filmes = filmeDAO.listarFilmesDisponiveis();
+        List<Filme> filmesAlugados = new ArrayList<>();
+        float valorTotal = 0;
+        boolean continuar = true;
+        while (continuar) {
+            if (filmes.isEmpty()) {
+                System.out.println("Todos os filmes já foram alugados.");
+                break;
+            }
+
+            for (Filme filme : filmes) {
+                System.out.println("ID: " + filme.getId() +
+                        " | Título: " + filme.getTitulo() +
+                        " | Valor: R$" + filme.getValor() +
+                        " | Disponível: " + filme.getQuantidadeDisponivel());
+            }
+
+            System.out.print("Digite o ID do filme que deseja alugar (ou 0 para finalizar): ");
+            int idFilme = leia.nextInt();
+
+            if (idFilme == 0) {
+                break;
+            }
+
+            Optional<Filme> optFilme = filmes.stream()
+                    .filter(f -> f.getId() == idFilme)
+                    .findFirst();
+
+            if (optFilme.isPresent()) {
+                Filme filme = optFilme.get();
+                if (filme.getQuantidadeDisponivel() > 0) {
+                    filme.setQuantidadeDisponivel(filme.getQuantidadeDisponivel() - 1);
+                    filmesAlugados.add(filme);
+                    System.out.println("Filme \"" + filme.getTitulo() + "\" adicionado à locação.");
+                    if (filme.getQuantidadeDisponivel() == 0) {
+                        filmes.remove(filme);
+                    }
+                    valorTotal += filme.getValor();
+                } else {
+                    System.out.println("Filme não disponível no momento.");
+                }
+            } else {
+                System.out.println("ID inválido. Tente novamente.");
+            }
+    
+        }
+
+        aluguel.setValorPagar(valorTotal);
+        
+        aluguel.setId(aluguelDAO.inserirAluguel(aluguel));
+        if (aluguel.getId() == 0 || aluguel.getId() == -1) {
             System.out.println("Erro ao criar a locação.");
             return;
         }
 
-        float total = 0;
-        boolean continuar = true;
-        while (continuar) {
-            System.out.println("\nFilmes disponíveis para locação:");
-            List<Filme> filmes = filmeDAO.listarFilmes();
-            for (Filme filme : filmes) {
-                System.out.println("ID: " + filme.getId() +
-                        " | Título: " + filme.getTitulo() +
-                        " | Valor: R$" + filme.getValor());
-            }
+        for (Filme filme : filmesAlugados) {
+            Acervo acervoDisponivel = acervoDAO.buscarProximoAcervoDisponivel(filme.getId());
+            if (acervoDisponivel != null) {
+                acervoDisponivel.setSituacao(Acervo.Situacao.ALUGADO);
+                acervoDAO.alterarSituacao(acervoDisponivel.getIdAcervo(), Acervo.Situacao.ALUGADO);
 
-            System.out.print("Digite o ID do filme que deseja alugar: ");
-            int idFilmeEscolhido = leia.nextInt();
-
-            // Buscar acervos DISPONÍVEIS desse filme
-            List<Acervo> acervosDisponiveis = acervoDAO.listarAcervosPorSituacao(Acervo.Situacao.DISPONIVEL)
-                    .stream()
-                    .filter(a -> a.getFilmeId() == idFilmeEscolhido)
-                    .toList();
-
-            if (acervosDisponiveis.isEmpty()) {
-                System.out.println("Não há exemplares disponíveis desse filme para locação.");
-            } else {
-                Acervo acervoParaAlugar = acervosDisponiveis.get(0); // pega o primeiro disponível
-
-                // Inserir em itemlocacao
                 ItemLocacao item = new ItemLocacao();
                 item.setIdLocacao(aluguel.getId());
-                item.setIdAcervo(acervoParaAlugar.getIdAcervo());
+                item.setIdAcervo(acervoDisponivel.getIdAcervo());
+                itemLocacaoDAO.inserirItemLocacao(item);
 
-                if (itemLocacaoDAO.inserirItemLocacao(item)) {
-                    System.out.println("Filme adicionado à locação!");
-                    total += filmeDAO.buscarFilmePorId(idFilmeEscolhido).getValor();
-
-                    // Atualiza situação para ALUGADO
-                    acervoDAO.alterarSituacao(acervoParaAlugar.getIdAcervo(), Acervo.Situacao.ALUGADO);
-                } else {
-                    System.out.println("Erro ao adicionar item à locação.");
-                }
+            } else {
+                System.out.println("Erro: sem acervo para o filme " + filme.getTitulo());
+                return;
             }
-
-            System.out.println("Deseja alugar outro filme? (s/n): ");
-            leia.nextLine(); // limpar buffer
-            String resp = leia.nextLine();
-            continuar = resp.equalsIgnoreCase("s");
         }
-
-        // Atualizar valor total
-        aluguelDAO.atualizarValorFinalEMulta(aluguel.getId(), total, 0, 1);
-        System.out.println("Locação realizada com sucesso. Valor total: R$" + total);
+        System.out.println("Locação realizada com sucesso!");
     }
 
     public static void realizarDevolucao() {
@@ -744,7 +774,123 @@ public class App {
             }
         }
     }
-    
+
+    public static void listarLocacoesPendentes() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ClienteDAO clienteDAO = new ClienteDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+        ItemLocacaoDAO itemDAO = new ItemLocacaoDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+
+        ArrayList<Aluguel> alugueis = aluguelDAO.listaAlugueisPendentes();
+        ArrayList<Cliente> clientes = clienteDAO.listarClientes();
+
+        if (alugueis.isEmpty()) {
+            System.out.println("Nenhuma locação encontrada.");
+            return;
+        }
+
+        for (Aluguel aluguel : alugueis) {
+            System.out.println("\n=============================");
+            System.out.println("ID Locação: " + aluguel.getId());
+            System.out.println("CPF Cliente: " + aluguel.getClienteCpf());
+
+            Cliente cli = clientes.stream()
+                    .filter(c -> c.getCpf().equals(aluguel.getClienteCpf()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (cli != null) {
+                System.out.println("Nome: " + cli.getNomeCompleto());
+            }
+
+            System.out.println("Data Aluguel: " + aluguel.getDataAluguel());
+            System.out.println("Data Devolução: " + aluguel.getDataDevolucao());
+            System.out.println("Valor Final: R$" + aluguel.getValorPagar());
+            System.out.println("Multa: R$" + aluguel.getMulta());
+            System.out.println("Status: " + (aluguel.getPendente() == 1 ? "PENDENTE" : "DEVOLVIDO"));
+
+            List<ItemLocacao> itens = itemDAO.listarItensPorLocacao(aluguel.getId());
+            if (!itens.isEmpty()) {
+                System.out.println("Filmes alugados:");
+                for (ItemLocacao item : itens) {
+                    Acervo acervo = acervoDAO.buscarAcervoPorId(item.getIdAcervo());
+                    if (acervo != null) {
+                        Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                        System.out.println("  - " + (filme != null ? filme.getTitulo() : "Filme não encontrado"));
+                    }
+                }
+            } else {
+                System.out.println("Nenhum item associado à locação.");
+            }
+        }
+    }
+
+   public static void listaLocacoesAtrasadas() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ArrayList<Aluguel> alugueisAtrasados = aluguelDAO.listaAlugueisAtrasados();
+
+        if (alugueisAtrasados.isEmpty()) {
+            System.out.println("Nenhuma locação atrasada encontrada.");
+            return;
+        }
+
+        System.out.println("\n--- Locações Atrasadas ---");
+        for (Aluguel aluguel : alugueisAtrasados) {
+            System.out.println("ID Locação: " + aluguel.getId() +
+                    " | CPF Cliente: " + aluguel.getClienteCpf() +
+                    " | Nome Cliente: " + aluguel.getClienteNome() +
+                    " | Data Aluguel: " + aluguel.getDataAluguel() +
+                    " | Data Devolução: " + aluguel.getDataDevolucao() +
+                    " | Valor Pendente: R$" + aluguel.getValorPagar());
+        }
+    }
+   
+    public static void listaLocacoesPorCliente() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ItemLocacaoDAO itemLocacaoDAO = new ItemLocacaoDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+
+        System.out.print("Digite o CPF do cliente: ");
+        leia.nextLine(); // limpar buffer
+        String cpf = leia.nextLine();
+
+        if (Utils.verificarExistenciaCliente(cpf) == 0) {
+            System.out.println("Cliente não encontrado.");
+            return;
+        }
+
+        ArrayList<Aluguel> alugueis = aluguelDAO.listarAlugueisPorCliente(cpf);
+        if (alugueis.isEmpty()) {
+            System.out.println("Nenhuma locação encontrada para o cliente com CPF: " + cpf);
+            return;
+        }
+
+        for (Aluguel aluguel : alugueis) {
+            System.out.println("\n=============================");
+            System.out.println("ID Locação: " + aluguel.getId());
+            System.out.println("Data Aluguel: " + aluguel.getDataAluguel());
+            System.out.println("Data Devolução: " + aluguel.getDataDevolucao());
+            System.out.println("Valor Final: R$" + aluguel.getValorPagar());
+            System.out.println("Status: " + (aluguel.getPendente() == 1 ? "PENDENTE" : "DEVOLVIDO"));
+
+            List<ItemLocacao> itens = itemLocacaoDAO.listarItensPorLocacao(aluguel.getId());
+            if (!itens.isEmpty()) {
+                System.out.println("Filmes alugados:");
+                for (ItemLocacao item : itens) {
+                    Acervo acervo = acervoDAO.buscarAcervoPorId(item.getIdAcervo());
+                    if (acervo != null) {
+                        Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                        System.out.println("  - " + (filme != null ? filme.getTitulo() : "Filme não encontrado"));
+                    }
+                }
+            } else {
+                System.out.println("Nenhum item associado à locação.");
+            }
+        }
+    }
+    // ----------Acervo----------------
     public static void menuAcervo() {
         AcervoDAO acervoDAO = new AcervoDAO();
         FilmeDAO filmeDAO = new FilmeDAO();
@@ -823,7 +969,8 @@ public class App {
                     break;
 
                 case 5:
-                    return;
+                    menuPrincipal();
+                    break;
 
                 default:
                     System.out.println("Opção inválida.");

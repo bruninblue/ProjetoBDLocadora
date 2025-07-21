@@ -122,4 +122,27 @@ public class AcervoDAO {
 
         return true;
     }
+
+    public Acervo buscarProximoAcervoDisponivel(int idFilme) {
+        String query = "SELECT * FROM acervo WHERE filme_id = ? AND situacao = 'DISPONIVEL' LIMIT 1";
+        Acervo acervo = null;
+
+        try (PreparedStatement ps = Conexao.getConexao().prepareStatement(query)) {
+            ps.setInt(1, idFilme);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                acervo = new Acervo();
+                acervo.setIdAcervo(rs.getInt("idAcervo"));
+                acervo.setFilmeId(rs.getInt("filme_id"));
+                acervo.setSituacao(Acervo.Situacao.valueOf(rs.getString("situacao")));
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Erro ao buscar próximo acervo disponível: " + e.getMessage());
+        }
+
+        return acervo;
+    }
 }

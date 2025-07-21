@@ -8,6 +8,8 @@ public class Filme {
     private Date dataLancamento;
     private int genero;
     private float valor;
+    private int quantidadeDisponivel;
+    private int quantidadeAlugada;
 
     public int getId() {
         return id;
@@ -38,6 +40,12 @@ public class Filme {
     }
     public void setValor(float valor) {
         this.valor = valor;
+    }
+    public int getQuantidadeDisponivel() {
+        return quantidadeDisponivel;
+    }
+    public void setQuantidadeDisponivel(int quantidadeDisponivel) {
+        this.quantidadeDisponivel = quantidadeDisponivel;
     }
 
     
