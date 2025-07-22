@@ -168,7 +168,7 @@ public class App {
                     listaLocacoesPorCliente();
                     break;
                 case 7:
-                    // excluirLocacao();
+                    excluirLocacao();
                     break;
                 case 8:
                     return;
@@ -378,6 +378,7 @@ public class App {
                 System.out.println("Data de Lançamento: " + filme.getDataLancamento());
                 System.out.println("Gênero: " + tipoGenero);
                 System.out.println("Valor: " + filme.getValor());
+                System.out.println("Cópias Disponíveis: " + filme.getQuantidadeDisponivel());
             }
         }
     }
@@ -889,6 +890,54 @@ public class App {
                 System.out.println("Nenhum item associado à locação.");
             }
         }
+    }
+   
+   public static void excluirLocacao() {
+        AluguelDAO aluguelDAO = new AluguelDAO();
+        ItemLocacaoDAO itemLocacaoDAO = new ItemLocacaoDAO();
+        AcervoDAO acervoDAO = new AcervoDAO();
+        FilmeDAO filmeDAO = new FilmeDAO();
+        
+        listarLocacoes();
+
+        System.out.print("Digite o ID da locação que deseja excluir: ");
+        int idLocacao = leia.nextInt();
+
+        Aluguel aluguelSelecionado = aluguelDAO.listarAluguelPorId(idLocacao);
+        if (aluguelSelecionado == null) {
+            System.out.println("ID de locação inválido.");
+            return;
+        }
+        System.out.print("Tem certeza que deseja excluir a locação com ID " + idLocacao + "? (s/n): ");
+        leia.nextLine();
+
+        String confirmacao = leia.nextLine();
+        if (!confirmacao.equalsIgnoreCase("s")) {
+            System.out.println("Exclusão cancelada.");
+            return;
+        }
+
+        ArrayList<ItemLocacao> itensParaDevolver = itemLocacaoDAO.listarItensPorLocacao(idLocacao);
+        float total = 0;
+
+        for (ItemLocacao item : itensParaDevolver) {
+            int idAcervo = item.getIdAcervo();
+
+            // Liberar acervo
+            acervoDAO.alterarSituacao(idAcervo, Acervo.Situacao.DISPONIVEL);
+
+            // Somar valor do filme
+            Acervo acervo = acervoDAO.buscarAcervoPorId(idAcervo);
+
+            if (acervo != null) {
+                Filme filme = filmeDAO.buscarFilmePorId(acervo.getFilmeId());
+                total += filme.getValor();
+            }
+        }
+        
+        itemLocacaoDAO.excluirItensPorLocacao(aluguelSelecionado.getId());
+        aluguelDAO.excluirAluguel(aluguelSelecionado.getId());
+
     }
     // ----------Acervo----------------
     public static void menuAcervo() {

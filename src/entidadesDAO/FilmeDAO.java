@@ -39,7 +39,7 @@ public class FilmeDAO {
 
     public List<Filme> listarFilmes() {
         List<Filme> listaFilmes = new ArrayList<>();
-        String query = "SELECT * FROM FILME";
+        String query = "SELECT f.*, COUNT(a.idAcervo) AS quantidadeDisponivel FROM filme f LEFT JOIN acervo a on a.filme_id = f.idFilme group by f.idFilme";
 
         PreparedStatement ps = null;
 
@@ -53,6 +53,7 @@ public class FilmeDAO {
                 filme.setDataLancamento(resultado.getDate("data_lancamento"));
                 filme.setGenero(resultado.getInt("genero_filme"));
                 filme.setValor(resultado.getFloat("valor_filme"));
+                filme.setQuantidadeDisponivel(resultado.getInt("quantidadeDisponivel"));
 
                 listaFilmes.add(filme);
             }
